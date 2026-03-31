@@ -1,0 +1,596 @@
+import os
+import json
+from openai import OpenAI
+
+client = OpenAI(
+    base_url="https://openrouter.ai/api/v1",
+    api_key="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",
+)
+
+# Define the output directory and file path
+output_dir = r'language\Mandarin'
+output_file = os.path.join(output_dir, 'MC_Question.txt')
+
+def get_Mandarin_MC_question():
+    """
+    Generate Mandarin word order questions for beginners learning Chinese grammar.
+    Reads previous questions from Order_question.txt and appends new questions to the same file.
+    
+    Returns:
+        list: A list of new word order questions that were added
+    """
+    
+    # Prepare previous questions by reading from Order_question.txt
+    previous_questions = []
+    if os.path.exists(output_file):
+        with open(output_file, 'r', encoding='utf-8') as file:
+            for line in file:
+                if line.strip():  # Ensure it's not empty
+                    # Convert the string representation of dict to actual dict
+                    try:
+                        item_dict = eval(line.strip())
+                        previous_questions.append(item_dict['question'])
+                    except:
+                        print(f"Could not parse line: {line}")
+    
+    completion = client.chat.completions.create(
+        model="openai/gpt-4o-mini",
+        messages=[
+            {
+                "role": "user",
+                "content": f"""請給我五題多選項題，關於中文文法，給我選項以及正確答案，一共要四個選項，題目是填充題，選項是四個詞語，只有一個正確答案，不要固定答案是同一個選項數目，答案選項有1/2/3/4，題目文法必須正確，format is as below:\n{{\n"question": “題目”,\n",\n"options":[選項1,選項2,選項3,選項4],\n"answer": [1/2/3/4，代表選項1/2/3/4],\n"explain": "English explain"\n}}，題目和選項用簡體，請不要重覆以下題目:{previous_questions}，输出最终的、有效的JSON数组，不要有任何其他额外的文本、解释或Markdown代码块标记。"""
+            }
+        ]
+    )
+    
+    response_content = completion.choices[0].message.content
+    print("Raw response:")
+    print(response_content)
+    print("=" * 50)
+    
+    # Clean the response - try multiple approaches (same as vocabulary code)
+    try:
+        # First, try to parse directly as JSON
+        result_array = json.loads(response_content)
+    except json.JSONDecodeError:
+        try:
+            # If that fails, try removing newlines but keeping spaces
+            cleaned_content = response_content.replace('\n', '')
+            # Try parsing the cleaned content directly
+            result_array = json.loads(cleaned_content)
+        except json.JSONDecodeError:
+            try:
+                # If that fails, try wrapping in array brackets
+                cleaned_content = response_content.replace('\n', '')
+                json_array_string = '[' + cleaned_content + ']'
+                result_array = json.loads(json_array_string)
+            except json.JSONDecodeError:
+                try:
+                    # Last resort: extract JSON using string manipulation
+                    # Remove any text before the first [ and after the last ]
+                    start_idx = response_content.find('[')
+                    end_idx = response_content.rfind(']') + 1
+                    if start_idx != -1 and end_idx != -1:
+                        json_content = response_content[start_idx:end_idx]
+                        result_array = json.loads(json_content)
+                    else:
+                        raise ValueError("Could not find JSON array in response")
+                except Exception as e:
+                    print(f"Failed to parse response as JSON: {e}")
+                    print("Response content was:")
+                    print(response_content)
+                    # Fallback: create an empty array
+                    result_array = []
+    
+    # Create directory if it doesn't exist
+    os.makedirs(output_dir, exist_ok=True)
+    
+    # Append new items to existing file
+    with open(output_file, 'a', encoding='utf-8') as f:  # Use 'a' for append mode
+        for item in result_array:
+            # Write as proper JSON string on new lines
+            f.write(json.dumps(item, ensure_ascii=False) + '\n')
+    
+    print(f"Successfully appended {len(result_array)} new items")
+    print(f"Data successfully appended to {output_file}")
+    
+    return result_array
+
+# Example usage:
+if __name__ == "__main__":
+    # Get new questions and save them to file
+    new_questions = get_Mandarin_MC_question()
+    
+    # Print the new items that were added
+    print("\nNew items added:")
+    for i, item in enumerate(new_questions, 1):
+        print(f"{i}. Question: {item['question']}")
+        print(f"   Answer: {item['answer']}")
+        print(f"   Explanation: {item['explain']}")
+        print()
+import os
+import json
+from openai import OpenAI
+
+client = OpenAI(
+    base_url="https://openrouter.ai/api/v1",
+    api_key="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",
+)
+
+# Define the output directory and file path
+output_dir = r'language\Spanish'
+output_file = os.path.join(output_dir, 'MC_Question.txt')
+
+def get_Spanish_MC_question():
+    """
+    Generate Spanish word order questions for beginners learning Chinese grammar.
+    Reads previous questions from Order_question.txt and appends new questions to the same file.
+    
+    Returns:
+        list: A list of new word order questions that were added
+    """
+    
+    # Prepare previous questions by reading from Order_question.txt
+    previous_questions = []
+    if os.path.exists(output_file):
+        with open(output_file, 'r', encoding='utf-8') as file:
+            for line in file:
+                if line.strip():  # Ensure it's not empty
+                    # Convert the string representation of dict to actual dict
+                    try:
+                        item_dict = eval(line.strip())
+                        previous_questions.append(item_dict['question'])
+                    except:
+                        print(f"Could not parse line: {line}")
+    
+    completion = client.chat.completions.create(
+        model="openai/gpt-4o-mini",
+        messages=[
+            {
+                "role": "user",
+                "content": f"""Please provide five multiple-choice questions regarding Spanish grammar. Each question should be a fill-in-the-blank type with four options, where only one option is correct. The options should be words that can fit into the blanks of the questions, and the correct answer option should be randomized e.g question 1:2 question2:4. The answer options should be labeled as 1, 2, 3, or 4. The sentences in the questions must be grammatically correct in Spanish. The format should be as follows:
+
+{{
+"question": “Question”，
+"options": [Option1, Option2, Option3, Option4],
+"answer": [1/2/3/4, representing the selected option],
+"explain": "English explanation"
+}}
+
+The questions and options should be in Spanish, and please do not repeat the questions provided in: {previous_questions}. Output a final, valid JSON array without any additional text, explanations, or Markdown code block markings.
+
+"""
+            }
+        ]
+    )
+    
+    response_content = completion.choices[0].message.content
+    print("Raw response:")
+    print(response_content)
+    print("=" * 50)
+    
+    # Clean the response - try multiple approaches (same as vocabulary code)
+    try:
+        # First, try to parse directly as JSON
+        result_array = json.loads(response_content)
+    except json.JSONDecodeError:
+        try:
+            # If that fails, try removing newlines but keeping spaces
+            cleaned_content = response_content.replace('\n', '')
+            # Try parsing the cleaned content directly
+            result_array = json.loads(cleaned_content)
+        except json.JSONDecodeError:
+            try:
+                # If that fails, try wrapping in array brackets
+                cleaned_content = response_content.replace('\n', '')
+                json_array_string = '[' + cleaned_content + ']'
+                result_array = json.loads(json_array_string)
+            except json.JSONDecodeError:
+                try:
+                    # Last resort: extract JSON using string manipulation
+                    # Remove any text before the first [ and after the last ]
+                    start_idx = response_content.find('[')
+                    end_idx = response_content.rfind(']') + 1
+                    if start_idx != -1 and end_idx != -1:
+                        json_content = response_content[start_idx:end_idx]
+                        result_array = json.loads(json_content)
+                    else:
+                        raise ValueError("Could not find JSON array in response")
+                except Exception as e:
+                    print(f"Failed to parse response as JSON: {e}")
+                    print("Response content was:")
+                    print(response_content)
+                    # Fallback: create an empty array
+                    result_array = []
+    
+    # Create directory if it doesn't exist
+    os.makedirs(output_dir, exist_ok=True)
+    
+    # Append new items to existing file
+    with open(output_file, 'a', encoding='utf-8') as f:  # Use 'a' for append mode
+        for item in result_array:
+            # Write as proper JSON string on new lines
+            f.write(json.dumps(item, ensure_ascii=False) + '\n')
+    
+    print(f"Successfully appended {len(result_array)} new items")
+    print(f"Data successfully appended to {output_file}")
+    
+    return result_array
+
+# Example usage:
+if __name__ == "__main__":
+    # Get new questions and save them to file
+    new_questions = get_Spanish_MC_question()
+    
+    # Print the new items that were added
+    print("\nNew items added:")
+    for i, item in enumerate(new_questions, 1):
+        print(f"{i}. Question: {item['question']}")
+        print(f"   Answer: {item['answer']}")
+        print(f"   Explanation: {item['explain']}")
+        print()
+import os
+import json
+from openai import OpenAI
+
+client = OpenAI(
+    base_url="https://openrouter.ai/api/v1",
+    api_key="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",
+)
+
+# Define the output directory and file path
+output_dir = r'language\Japanese'
+output_file = os.path.join(output_dir, 'MC_Question.txt')
+
+def get_Japanese_MC_question():
+    """
+    Generate Spanish word order questions for beginners learning Chinese grammar.
+    Reads previous questions from Order_question.txt and appends new questions to the same file.
+    
+    Returns:
+        list: A list of new word order questions that were added
+    """
+    
+    # Prepare previous questions by reading from Order_question.txt
+    previous_questions = []
+    if os.path.exists(output_file):
+        with open(output_file, 'r', encoding='utf-8') as file:
+            for line in file:
+                if line.strip():  # Ensure it's not empty
+                    # Convert the string representation of dict to actual dict
+                    try:
+                        item_dict = eval(line.strip())
+                        previous_questions.append(item_dict['question'])
+                    except:
+                        print(f"Could not parse line: {line}")
+    
+    completion = client.chat.completions.create(
+        model="openai/gpt-4o-mini",
+        messages=[
+            {
+                "role": "user",
+                "content": f"""Please provide five multiple-choice questions regarding Japanese grammar. Each question should be a fill-in-the-blank type with four options, where only one option is correct. The options should be words that can fit into the blanks of the questions, and the correct answer option should be randomized e.g question 1:3 question2:1. The answer options should be labeled as 1, 2, 3, or 4. The sentences in the questions must be grammatically correct in Japanese. The format should be as follows:
+
+{{
+"question": “Question”，
+"options": [Option1, Option2, Option3, Option4],
+"answer": [1/2/3/4, representing the selected option],
+"explain": "English explanation"
+}}
+
+The questions and options should be in Japanese, and please do not repeat the questions provided in: {previous_questions}. Output a final, valid JSON array without any additional text, explanations, or Markdown code block markings.
+
+"""
+            }
+        ]
+    )
+    
+    response_content = completion.choices[0].message.content
+    print("Raw response:")
+    print(response_content)
+    print("=" * 50)
+    
+    # Clean the response - try multiple approaches (same as vocabulary code)
+    try:
+        # First, try to parse directly as JSON
+        result_array = json.loads(response_content)
+    except json.JSONDecodeError:
+        try:
+            # If that fails, try removing newlines but keeping spaces
+            cleaned_content = response_content.replace('\n', '')
+            # Try parsing the cleaned content directly
+            result_array = json.loads(cleaned_content)
+        except json.JSONDecodeError:
+            try:
+                # If that fails, try wrapping in array brackets
+                cleaned_content = response_content.replace('\n', '')
+                json_array_string = '[' + cleaned_content + ']'
+                result_array = json.loads(json_array_string)
+            except json.JSONDecodeError:
+                try:
+                    # Last resort: extract JSON using string manipulation
+                    # Remove any text before the first [ and after the last ]
+                    start_idx = response_content.find('[')
+                    end_idx = response_content.rfind(']') + 1
+                    if start_idx != -1 and end_idx != -1:
+                        json_content = response_content[start_idx:end_idx]
+                        result_array = json.loads(json_content)
+                    else:
+                        raise ValueError("Could not find JSON array in response")
+                except Exception as e:
+                    print(f"Failed to parse response as JSON: {e}")
+                    print("Response content was:")
+                    print(response_content)
+                    # Fallback: create an empty array
+                    result_array = []
+    
+    # Create directory if it doesn't exist
+    os.makedirs(output_dir, exist_ok=True)
+    
+    # Append new items to existing file
+    with open(output_file, 'a', encoding='utf-8') as f:  # Use 'a' for append mode
+        for item in result_array:
+            # Write as proper JSON string on new lines
+            f.write(json.dumps(item, ensure_ascii=False) + '\n')
+    
+    print(f"Successfully appended {len(result_array)} new items")
+    print(f"Data successfully appended to {output_file}")
+    
+    return result_array
+
+# Example usage:
+if __name__ == "__main__":
+    # Get new questions and save them to file
+    new_questions = get_Japanese_MC_question()
+    
+    # Print the new items that were added
+    print("\nNew items added:")
+    for i, item in enumerate(new_questions, 1):
+        print(f"{i}. Question: {item['question']}")
+        print(f"   Answer: {item['answer']}")
+        print(f"   Explanation: {item['explain']}")
+        print()
+
+import os
+import json
+from openai import OpenAI
+
+client = OpenAI(
+    base_url="https://openrouter.ai/api/v1",
+    api_key="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",
+)
+
+# Define the output directory and file path
+output_dir = r'language\German'
+output_file = os.path.join(output_dir, 'MC_Question.txt')
+
+def get_German_MC_question():
+    """
+    Generate Germanh word order questions for beginners learning Chinese grammar.
+    Reads previous questions from Order_question.txt and appends new questions to the same file.
+    
+    Returns:
+        list: A list of new word order questions that were added
+    """
+    
+    # Prepare previous questions by reading from Order_question.txt
+    previous_questions = []
+    if os.path.exists(output_file):
+        with open(output_file, 'r', encoding='utf-8') as file:
+            for line in file:
+                if line.strip():  # Ensure it's not empty
+                    # Convert the string representation of dict to actual dict
+                    try:
+                        item_dict = eval(line.strip())
+                        previous_questions.append(item_dict['question'])
+                    except:
+                        print(f"Could not parse line: {line}")
+    
+    completion = client.chat.completions.create(
+        model="openai/gpt-4o-mini",
+        messages=[
+            {
+                "role": "user",
+                "content": f"""Please provide five multiple-choice questions regarding German grammar. Each question should be a fill-in-the-blank type with four options, where only one option is correct. The options should be words that can fit into the blanks of the questions, and the correct answer option should be randomized e.g question 1:3 question2:1. The answer options should be labeled as 1, 2, 3, or 4. The sentences in the questions must be grammatically correct in German. The format should be as follows:
+
+{{
+"question": “Question”，
+"options": [Option1, Option2, Option3, Option4],
+"answer": [1/2/3/4, representing the selected option],
+"explain": "English explanation"
+}}
+
+The questions and options should be in German, and please do not repeat the questions provided in: {previous_questions}. Output a final, valid JSON array without any additional text, explanations, or Markdown code block markings.
+
+"""
+            }
+        ]
+    )
+    
+    response_content = completion.choices[0].message.content
+    print("Raw response:")
+    print(response_content)
+    print("=" * 50)
+    
+    # Clean the response - try multiple approaches (same as vocabulary code)
+    try:
+        # First, try to parse directly as JSON
+        result_array = json.loads(response_content)
+    except json.JSONDecodeError:
+        try:
+            # If that fails, try removing newlines but keeping spaces
+            cleaned_content = response_content.replace('\n', '')
+            # Try parsing the cleaned content directly
+            result_array = json.loads(cleaned_content)
+        except json.JSONDecodeError:
+            try:
+                # If that fails, try wrapping in array brackets
+                cleaned_content = response_content.replace('\n', '')
+                json_array_string = '[' + cleaned_content + ']'
+                result_array = json.loads(json_array_string)
+            except json.JSONDecodeError:
+                try:
+                    # Last resort: extract JSON using string manipulation
+                    # Remove any text before the first [ and after the last ]
+                    start_idx = response_content.find('[')
+                    end_idx = response_content.rfind(']') + 1
+                    if start_idx != -1 and end_idx != -1:
+                        json_content = response_content[start_idx:end_idx]
+                        result_array = json.loads(json_content)
+                    else:
+                        raise ValueError("Could not find JSON array in response")
+                except Exception as e:
+                    print(f"Failed to parse response as JSON: {e}")
+                    print("Response content was:")
+                    print(response_content)
+                    # Fallback: create an empty array
+                    result_array = []
+    
+    # Create directory if it doesn't exist
+    os.makedirs(output_dir, exist_ok=True)
+    
+    # Append new items to existing file
+    with open(output_file, 'a', encoding='utf-8') as f:  # Use 'a' for append mode
+        for item in result_array:
+            # Write as proper JSON string on new lines
+            f.write(json.dumps(item, ensure_ascii=False) + '\n')
+    
+    print(f"Successfully appended {len(result_array)} new items")
+    print(f"Data successfully appended to {output_file}")
+    
+    return result_array
+
+# Example usage:
+if __name__ == "__main__":
+    # Get new questions and save them to file
+    new_questions = get_German_MC_question()
+    
+    # Print the new items that were added
+    print("\nNew items added:")
+    for i, item in enumerate(new_questions, 1):
+        print(f"{i}. Question: {item['question']}")
+        print(f"   Answer: {item['answer']}")
+        print(f"   Explanation: {item['explain']}")
+        print()
+
+import os
+import json
+from openai import OpenAI
+
+client = OpenAI(
+    base_url="https://openrouter.ai/api/v1",
+    api_key="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",
+)
+
+# Define the output directory and file path
+output_dir = r'language\French'
+output_file = os.path.join(output_dir, 'MC_Question.txt')
+
+def get_French_MC_question():
+    """
+    Generate French word order questions for beginners learning Chinese grammar.
+    Reads previous questions from Order_question.txt and appends new questions to the same file.
+    
+    Returns:
+        list: A list of new word order questions that were added
+    """
+    
+    # Prepare previous questions by reading from Order_question.txt
+    previous_questions = []
+    if os.path.exists(output_file):
+        with open(output_file, 'r', encoding='utf-8') as file:
+            for line in file:
+                if line.strip():  # Ensure it's not empty
+                    # Convert the string representation of dict to actual dict
+                    try:
+                        item_dict = eval(line.strip())
+                        previous_questions.append(item_dict['question'])
+                    except:
+                        print(f"Could not parse line: {line}")
+    
+    completion = client.chat.completions.create(
+        model="openai/gpt-4o-mini",
+        messages=[
+            {
+                "role": "user",
+                "content": f"""Please provide five multiple-choice questions regarding French grammar. Each question should be a fill-in-the-blank type with four options, where only one option is correct. The options should be words that can fit into the blanks of the questions, and the correct answer option should be randomized e.g question 1:3 question2:1. The answer options should be labeled as 1, 2, 3, or 4. The sentences in the questions must be grammatically correct in French. The format should be as follows:
+
+{{
+"question": “Question”，
+"options": [Option1, Option2, Option3, Option4],
+"answer": [1/2/3/4, representing the selected option],
+"explain": "English explanation"
+}}
+
+The questions and options should be in French, and please do not repeat the questions provided in: {previous_questions}. Output a final, valid JSON array without any additional text, explanations, or Markdown code block markings.
+
+"""
+            }
+        ]
+    )
+    
+    response_content = completion.choices[0].message.content
+    print("Raw response:")
+    print(response_content)
+    print("=" * 50)
+    
+    # Clean the response - try multiple approaches (same as vocabulary code)
+    try:
+        # First, try to parse directly as JSON
+        result_array = json.loads(response_content)
+    except json.JSONDecodeError:
+        try:
+            # If that fails, try removing newlines but keeping spaces
+            cleaned_content = response_content.replace('\n', '')
+            # Try parsing the cleaned content directly
+            result_array = json.loads(cleaned_content)
+        except json.JSONDecodeError:
+            try:
+                # If that fails, try wrapping in array brackets
+                cleaned_content = response_content.replace('\n', '')
+                json_array_string = '[' + cleaned_content + ']'
+                result_array = json.loads(json_array_string)
+            except json.JSONDecodeError:
+                try:
+                    # Last resort: extract JSON using string manipulation
+                    # Remove any text before the first [ and after the last ]
+                    start_idx = response_content.find('[')
+                    end_idx = response_content.rfind(']') + 1
+                    if start_idx != -1 and end_idx != -1:
+                        json_content = response_content[start_idx:end_idx]
+                        result_array = json.loads(json_content)
+                    else:
+                        raise ValueError("Could not find JSON array in response")
+                except Exception as e:
+                    print(f"Failed to parse response as JSON: {e}")
+                    print("Response content was:")
+                    print(response_content)
+                    # Fallback: create an empty array
+                    result_array = []
+    
+    # Create directory if it doesn't exist
+    os.makedirs(output_dir, exist_ok=True)
+    
+    # Append new items to existing file
+    with open(output_file, 'a', encoding='utf-8') as f:  # Use 'a' for append mode
+        for item in result_array:
+            # Write as proper JSON string on new lines
+            f.write(json.dumps(item, ensure_ascii=False) + '\n')
+    
+    print(f"Successfully appended {len(result_array)} new items")
+    print(f"Data successfully appended to {output_file}")
+    
+    return result_array
+
+# Example usage:
+if __name__ == "__main__":
+    # Get new questions and save them to file
+    new_questions = get_French_MC_question()
+    
+    # Print the new items that were added
+    print("\nNew items added:")
+    for i, item in enumerate(new_questions, 1):
+        print(f"{i}. Question: {item['question']}")
+        print(f"   Answer: {item['answer']}")
+        print(f"   Explanation: {item['explain']}")
+        print()
