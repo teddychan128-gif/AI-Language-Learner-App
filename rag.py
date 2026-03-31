@@ -11,7 +11,7 @@ from langchain_core.output_parsers import StrOutputParser
 from langchain_huggingface import HuggingFaceEmbeddings  # 新增：本地嵌入
 
 # API key (僅用於生成；嵌入現在本地)
-API_KEY = "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"
+API_KEY = "yoyr-api-key"
 GENERATION_MODEL = "meta-llama/llama-3.1-8b-instruct"
 BASE_URL = "https://openrouter.ai/api/v1"
 
