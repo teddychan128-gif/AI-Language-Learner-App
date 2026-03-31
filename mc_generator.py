@@ -6,7 +6,7 @@ from openai import OpenAI
 
 client = OpenAI(
     base_url="https://openrouter.ai/api/v1",
-    api_key="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",
+    api_key="your-api-key",
 )
 
 def clean_json_response(response):
