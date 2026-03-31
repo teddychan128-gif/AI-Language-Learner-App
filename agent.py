@@ -16,7 +16,7 @@ from model import client  # Import OpenAI client from model.py for consistency
 import json
 
 # API key and model (shared from model.py)
-API_KEY = "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"
+API_KEY = "your-api-key"
 GENERATION_MODEL = "meta-llama/llama-3.1-8b-instruct"
 BASE_URL = "https://openrouter.ai/api/v1"
 
